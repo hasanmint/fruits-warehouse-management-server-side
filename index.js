@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const res = require('express/lib/response');
 const port = process.env.PORT || 5000;
 const app = express();
 
@@ -21,27 +22,34 @@ console.log('connect');
 
 async function run() {
     try {
-        const serviceCollection = client.db("fruitsWarehouse").collection("inventory");
+        const inventoryCollection = client.db("fruitsWarehouse").collection("inventory");
         await client.connect();
 
         //Find All Data
         app.get('/inventory', async (req, res) => {
             const query = {};
-            const cursor = serviceCollection.find(query);
-            const inventories  = await cursor.toArray();
+            const cursor = inventoryCollection.find(query);
+            const inventories = await cursor.toArray();
             res.send(inventories);
         })
 
         //Find One Data
-        app.get('/inventory/:id', async(req,res)=>{
-            const id=req.params.id;
-            const query={_id:ObjectId(id)};
-            const inventory = await serviceCollection.findOne(query);
+        app.get('/inventory/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const inventory = await inventoryCollection.findOne(query);
             res.send(inventory);
         })
 
+        //Add Data Post
+        app.post('/inventory', async (req, res) => {
+            const newInventory = req.body;
+            const result = await inventoryCollection.insertOne(newInventory);
+            res.send(result);
+        })
+
     } finally {
-        
+
     }
 }
 run().catch(console.dir);
