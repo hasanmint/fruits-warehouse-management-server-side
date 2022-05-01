@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 const app = express();
 
@@ -21,16 +21,25 @@ console.log('connect');
 
 async function run() {
     try {
-        const collection = client.db("fruitsWarehouse").collection("inventory");
+        const serviceCollection = client.db("fruitsWarehouse").collection("inventory");
         await client.connect();
 
-        //Find Data
+        //Find All Data
         app.get('/inventory', async (req, res) => {
             const query = {};
-            const cursor = collection.find(query);
+            const cursor = serviceCollection.find(query);
             const inventories  = await cursor.toArray();
             res.send(inventories);
         })
+
+        //Find One Data
+        app.get('/inventory/:id', async(req,res)=>{
+            const id=req.params.id;
+            const query={_id:ObjectId(id)};
+            const inventory = await serviceCollection.findOne(query);
+            res.send(inventory);
+        })
+
     } finally {
         
     }
@@ -43,7 +52,7 @@ app.get('/', (req, res) => {
     res.send('Welcome warehouse management Server');
 });
 
-app.get('/demo', (req, res) => {
+app.get('/test', (req, res) => {
     res.send('Demo Data')
 })
 
