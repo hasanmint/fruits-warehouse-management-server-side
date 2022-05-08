@@ -68,9 +68,6 @@ app.get('/', (req, res) => {
     res.send('Welcome warehouse management Server');
 });
 
-app.get('/test', (req, res) => {
-    res.send('Demo Data')
-})
 
 app.listen(port, () => {
     console.log('Warehouse management Listen Server is Running');
